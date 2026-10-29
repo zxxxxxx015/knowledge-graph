@@ -1,0 +1,1036 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "input",
+    "source",
+    "original_text",
+    "processed_text",
+    "step0_provenance",
+    "structure",
+    "knowledge_statements",
+    "unhandled_regions",
+    "warnings",
+    "status"
+  ],
+  "properties": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step0_json_path",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "step0_json_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "source": {
+      "$ref": "#/$defs/step0/properties/source"
+    },
+    "original_text": {
+      "type": "string"
+    },
+    "processed_text": {
+      "type": "string"
+    },
+    "step0_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "replacements",
+        "unresolved",
+        "warnings",
+        "status"
+      ],
+      "properties": {
+        "replacements": {
+          "$ref": "#/$defs/step0/properties/replacements"
+        },
+        "unresolved": {
+          "$ref": "#/$defs/step0/properties/unresolved"
+        },
+        "warnings": {
+          "$ref": "#/$defs/step0/properties/warnings"
+        },
+        "status": {
+          "$ref": "#/$defs/step0/properties/status"
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "headings",
+        "tables",
+        "protected_regions"
+      ],
+      "properties": {
+        "headings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/heading"
+          }
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/table"
+          }
+        },
+        "protected_regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "processed_range",
+              "reason_code"
+            ],
+            "properties": {
+              "processed_range": {
+                "$ref": "#/$defs/range"
+              },
+              "reason_code": {
+                "enum": [
+                  "heading_context",
+                  "table_structure",
+                  "table_pending",
+                  "code_block",
+                  "unsupported_markdown"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "knowledge_statements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/statement"
+      }
+    },
+    "unhandled_regions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/region"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution_state",
+        "prompt_id",
+        "prompt_sha256",
+        "llm_call_count",
+        "llm_retry_count",
+        "statement_count",
+        "unhandled_count"
+      ],
+      "properties": {
+        "execution_state": {
+          "enum": [
+            "completed",
+            "completed_with_warnings"
+          ]
+        },
+        "prompt_id": {
+          "const": "prompts/step1.md"
+        },
+        "prompt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "llm_call_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "llm_retry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "statement_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unhandled_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "$defs": {
+    "step0": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "original_text",
+        "processed_text",
+        "replacements",
+        "unresolved",
+        "warnings",
+        "status"
+      ],
+      "properties": {
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "document_type",
+            "sha256",
+            "size_bytes",
+            "char_count",
+            "encoding"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "document_type": {
+              "enum": [
+                "md",
+                "txt"
+              ]
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "char_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "encoding": {
+              "const": "utf-8"
+            }
+          }
+        },
+        "original_text": {
+          "type": "string"
+        },
+        "processed_text": {
+          "type": "string"
+        },
+        "replacements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "original_text",
+              "replacement_text",
+              "source_range",
+              "processed_range",
+              "evidence_text",
+              "evidence_range",
+              "reference_type",
+              "reason"
+            ],
+            "properties": {
+              "original_text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "replacement_text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_range": {
+                "$ref": "#/$defs/step0/$defs/range"
+              },
+              "processed_range": {
+                "$ref": "#/$defs/step0/$defs/range"
+              },
+              "evidence_text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_range": {
+                "$ref": "#/$defs/step0/$defs/range"
+              },
+              "reference_type": {
+                "enum": [
+                  "pronoun",
+                  "demonstrative",
+                  "elliptical_name"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "original_text",
+              "source_range",
+              "reported_text",
+              "reported_range",
+              "proposed_replacement",
+              "reason_code",
+              "reason",
+              "origin",
+              "candidate_index"
+            ],
+            "properties": {
+              "original_text": {
+                "type": "string"
+              },
+              "source_range": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/step0/$defs/range"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reported_text": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reported_range": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/step0/$defs/reported_range"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "proposed_replacement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason_code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "enum": [
+                  "llm",
+                  "python_validation",
+                  "llm_failure"
+                ]
+              },
+              "candidate_index": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message",
+              "source_range",
+              "candidate_index"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_range": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/step0/$defs/range"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "candidate_index": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "execution_state",
+            "prompt_id",
+            "prompt_sha256",
+            "llm_call_count",
+            "llm_retry_count",
+            "candidate_count",
+            "applied_count",
+            "rejected_count",
+            "unresolved_count",
+            "warning_count",
+            "llm_error_kind"
+          ],
+          "properties": {
+            "execution_state": {
+              "enum": [
+                "completed",
+                "completed_with_warnings",
+                "llm_failed"
+              ]
+            },
+            "prompt_id": {
+              "const": "prompts/step0.md"
+            },
+            "prompt_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "llm_call_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "llm_retry_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "applied_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rejected_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unresolved_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "warning_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "llm_error_kind": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "$defs": {
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "reported_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "integer"
+            },
+            "end": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "original_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_range",
+        "text",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "source_range": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/range"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_range": {
+                "$ref": "#/$defs/range"
+              },
+              "text": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "source_range": {
+                "type": "null"
+              },
+              "text": {
+                "type": "null"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "heading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heading_id",
+        "parent_id",
+        "level",
+        "title",
+        "processed_range",
+        "text",
+        "original_mapping"
+      ],
+      "properties": {
+        "heading_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "title": {
+          "type": "string"
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "replacement_indexes",
+        "unresolved_indexes",
+        "warning_indexes",
+        "unlocated_unresolved_indexes",
+        "unlocated_warning_indexes"
+      ],
+      "properties": {
+        "replacement_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "unresolved_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "warning_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "unlocated_unresolved_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "unlocated_warning_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "header_cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "column_index",
+        "processed_range",
+        "text",
+        "original_mapping"
+      ],
+      "properties": {
+        "column_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "column_index",
+        "header_text",
+        "header_range",
+        "processed_range",
+        "text",
+        "original_mapping"
+      ],
+      "properties": {
+        "column_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "header_text": {
+          "type": "string"
+        },
+        "header_range": {
+          "$ref": "#/$defs/range"
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        }
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row_index",
+        "processed_range",
+        "text",
+        "original_mapping",
+        "cells"
+      ],
+      "properties": {
+        "row_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cell"
+          }
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "table_id",
+        "processed_range",
+        "text",
+        "original_mapping",
+        "header",
+        "separator",
+        "rows"
+      ],
+      "properties": {
+        "table_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        },
+        "header": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "processed_range",
+            "text",
+            "original_mapping",
+            "cells"
+          ],
+          "properties": {
+            "processed_range": {
+              "$ref": "#/$defs/range"
+            },
+            "text": {
+              "type": "string"
+            },
+            "original_mapping": {
+              "$ref": "#/$defs/original_mapping"
+            },
+            "cells": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/header_cell"
+              }
+            }
+          }
+        },
+        "separator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "processed_range",
+            "text",
+            "original_mapping"
+          ],
+          "properties": {
+            "processed_range": {
+              "$ref": "#/$defs/range"
+            },
+            "text": {
+              "type": "string"
+            },
+            "original_mapping": {
+              "$ref": "#/$defs/original_mapping"
+            }
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/row"
+          }
+        }
+      }
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement_id",
+        "source_ref",
+        "processed_range",
+        "text",
+        "original_mapping",
+        "heading_context",
+        "step0_trace",
+        "kind",
+        "boundary_reason",
+        "boundary_detail"
+      ],
+      "properties": {
+        "statement_id": {
+          "type": "string",
+          "pattern": "^ks_[0-9a-f]{64}$"
+        },
+        "source_ref": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        },
+        "heading_context": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/heading"
+          }
+        },
+        "step0_trace": {
+          "$ref": "#/$defs/trace"
+        },
+        "kind": {
+          "enum": [
+            "prose",
+            "list",
+            "table"
+          ]
+        },
+        "boundary_reason": {
+          "enum": [
+            "complete_sentence",
+            "independent_sentence",
+            "lead_list_dependency",
+            "causal_dependency",
+            "causal_chain",
+            "table_row",
+            "table_dependency"
+          ]
+        },
+        "boundary_detail": {
+          "type": "string",
+          "minLength": 1
+        },
+        "table_context": {
+          "$ref": "#/$defs/table"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "table"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "table_context"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "table_context"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processed_range",
+        "text",
+        "original_mapping",
+        "heading_context",
+        "step0_trace",
+        "reason_code",
+        "reason"
+      ],
+      "properties": {
+        "processed_range": {
+          "$ref": "#/$defs/range"
+        },
+        "text": {
+          "type": "string"
+        },
+        "original_mapping": {
+          "$ref": "#/$defs/original_mapping"
+        },
+        "heading_context": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/heading"
+          }
+        },
+        "step0_trace": {
+          "$ref": "#/$defs/trace"
+        },
+        "reason_code": {
+          "enum": [
+            "heading_context",
+            "table_structure",
+            "table_pending",
+            "code_block",
+            "unsupported_markdown",
+            "semantic_pending",
+            "incomplete_statement"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

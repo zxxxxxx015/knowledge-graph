@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["candidates", "unresolved"],
+  "properties": {
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["original_text", "replacement_text", "source_range", "evidence_text", "evidence_range", "reference_type", "context", "is_unique", "reason"],
+        "properties": {
+          "original_text": {"type": "string", "minLength": 1},
+          "replacement_text": {"type": "string", "minLength": 1},
+          "source_range": {"$ref": "#/$defs/reported_range"},
+          "evidence_text": {"type": "string", "minLength": 1},
+          "evidence_range": {"$ref": "#/$defs/reported_range"},
+          "reference_type": {"type": "string", "enum": ["pronoun", "demonstrative", "elliptical_name"]},
+          "context": {"type": "string", "enum": ["specific_reference", "generic_definition", "document_self_reference"]},
+          "is_unique": {"type": "boolean"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["original_text", "source_range", "reason"],
+        "properties": {
+          "original_text": {"type": "string", "minLength": 1},
+          "source_range": {"$ref": "#/$defs/reported_range"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "reported_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {"start": {"type": "integer"}, "end": {"type": "integer"}}
+    }
+  }
+}

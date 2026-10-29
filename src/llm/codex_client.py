@@ -160,7 +160,8 @@ class CodexClient:
         max_retries counts additional attempts. Only TIMEOUT, INVALID_JSON and
         SCHEMA_VALIDATION may be selected for retry; only TIMEOUT is selected by
         default. Invalid arguments raise ValueError before launching anything.
-        Invalid schemas return INVALID_SCHEMA with zero attempts.
+        Schema syntax errors return INVALID_SCHEMA with zero attempts; unresolved
+        references can also be discovered during final response validation.
         """
         self._check_arguments(prompt, timeout, max_retries, retry_delay, model)
         try:
@@ -177,8 +178,13 @@ class CodexClient:
             schema_text = json.dumps(schema, ensure_ascii=False, allow_nan=False)
             schema_text.encode("utf-8")
             snapshot = _strict_loads(schema_text)
-            validator_type = validator_for(snapshot, default=Draft202012Validator)
-            if "$schema" in snapshot and validator_for(snapshot, default=None) is None:
+            if "$schema" in snapshot and not isinstance(snapshot["$schema"], str):
+                raise ValueError("Schema dialect must be a URI string")
+            validator_type = (
+                validator_for(snapshot, default=None) if "$schema" in snapshot
+                else Draft202012Validator
+            )
+            if validator_type is None:
                 raise ValueError("Unknown schema dialect")
             validator_type.check_schema(snapshot)
             validator = validator_type(snapshot, registry=Registry(retrieve=_no_external_resource))
@@ -277,6 +283,8 @@ class CodexClient:
                     command, cwd=work, stdin=subprocess.PIPE,
                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                     text=True, encoding="utf-8", errors="strict", shell=False,
+                    env={key: value for key, value in os.environ.items()
+                         if key.upper() not in {"OPENAI_API_KEY", "CODEX_API_KEY"}},
                     **({"creationflags": subprocess.CREATE_NO_WINDOW} if _IS_WINDOWS
                        else {"start_new_session": True}),
                 )
