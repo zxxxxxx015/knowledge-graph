@@ -1,0 +1,2 @@
+# Install in an isolated uv environment; the existing .venv need not be changed.
+jsonschema>=4.23,<5
