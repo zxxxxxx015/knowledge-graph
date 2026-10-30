@@ -1,0 +1,188 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "statement_reviews",
+    "concept_groups"
+  ],
+  "properties": {
+    "statement_reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "statement_id",
+          "decision",
+          "basis",
+          "reason",
+          "candidates"
+        ],
+        "properties": {
+          "statement_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "decision": {
+            "enum": [
+              "kept",
+              "filtered",
+              "needs_review"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "knowledge_bearing",
+              "no_knowledge_value",
+              "uncertain"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/candidate"
+            }
+          }
+        }
+      }
+    },
+    "concept_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_ids",
+          "canonical_label",
+          "disambiguation",
+          "reason",
+          "identity_evidence"
+        ],
+        "properties": {
+          "candidate_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "canonical_label": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "disambiguation": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "identity_evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "surface_text",
+        "unit_kind",
+        "resolution",
+        "reason",
+        "evidence_quote"
+      ],
+      "properties": {
+        "candidate_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "surface_text": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "unit_kind": {
+          "enum": [
+            "concept",
+            "condition",
+            "behavior",
+            "state_change",
+            "causal_statement"
+          ]
+        },
+        "resolution": {
+          "enum": [
+            "confirmed",
+            "pending"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "evidence_quote": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement_id",
+        "text",
+        "evidence_quote"
+      ],
+      "properties": {
+        "statement_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "evidence_quote": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "source": {
+    "path": "C:\\Users\\User\\OneDrive\\Desktop\\知識圖譜\\source\\sample_technical_incident.md",
+    "document_type": "md",
+    "sha256": "949914955f19937243296c89d9b113f0064be848bacf04c4a4903845aff230f5",
+    "size_bytes": 2931,
+    "char_count": 1247,
+    "encoding": "utf-8"
+  },
+  "original_text": "# APC 控制器異常延遲測試案例\n\n## 場景背景\n\n此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。\n\nAPC 控制器每 100 ms 接收一次感測器資料，並依照 PID 控制邏輯更新閥門開度。\n\n當資料採集服務延遲時，控制器會使用上一筆有效感測值維持閉迴路控制。\n\n## 觀測指標\n\n- CPU 使用率高於 90% 持續 30 秒時，控制迴圈延遲會明顯增加。\n- 感測器資料延遲超過 250 ms 時，控制器會標記資料品質為 stale。\n- 閥門開度變化率超過每秒 12% 時，系統會提高採樣頻率。\n- 控制迴圈延遲的正常範圍應低於 120 ms。\n\n## 異常條件\n\n- 當 CPU 使用率高於 90% 且資料佇列長度超過 500 筆時，控制器可能無法即時處理新資料。\n- 當感測器資料連續三次逾時時，APC 控制器會進入降級模式。\n- 當網路封包遺失率高於 5% 時，資料採集服務會重送遺失封包。\n\n## 作用機制\n\n資料採集服務會先將感測器資料寫入佇列，再由控制器讀取最新資料進行控制計算。\n\n如果資料佇列累積過多，控制器讀取到的感測值會落後於現場設備狀態。\n\nPID 控制邏輯會根據目標值與量測值的誤差計算閥門開度。\n\n降級模式會限制閥門開度變化率，避免延遲資料造成過度控制。\n\n## 影響結果\n\n- 控制迴圈延遲增加會造成閥門開度更新變慢。\n- 閥門開度更新變慢會導致壓力調節時間拉長。\n- 壓力調節時間拉長可能造成產線流量波動。\n- 資料品質為 stale 時，監控畫面應顯示黃色警示。\n\n## 處置方式\n\n- 當控制迴圈延遲超過 120 ms 時，系統應記錄 performance warning。\n- 當降級模式啟動時，操作員應檢查 CPU 使用率、資料佇列長度與封包遺失率。\n- 若資料佇列長度持續超過 500 筆，應重新啟動資料採集服務。\n- 若 CPU 使用率持續高於 90%，應降低非關鍵診斷任務的執行頻率。\n\n## 定義\n\nstale 資料是指感測器資料的時間戳落後目前控制週期超過允許門檻。\n\n控制迴圈延遲是指感測器資料進入控制器到閥門命令輸出之間的時間差。\n\n降級模式是 APC 控制器在資料品質不足或處理延遲過高時採用的保護狀態。\n\n## 多句段落測試\n\nAPC 控制器延遲升高時，監控系統會記錄異常事件。CPU 使用率持續偏高時，資料採集服務的處理延遲可能增加。操作員確認降級模式啟動後，應檢查資料佇列長度。\n\n## 測試表格\n\n| 測試項目 | 觸發條件 | 預期結果 |\n| --- | --- | --- |\n| 高 CPU 負載 | CPU 使用率高於 90% 持續 30 秒 | 控制迴圈延遲增加並記錄 performance warning |\n| 資料逾時 | 感測器資料延遲超過 250 ms | 資料品質標記為 stale |\n| 佇列壅塞 | 資料佇列長度超過 500 筆 | 控制器可能讀取到過期感測值 |\n",
+  "processed_text": "# APC 控制器異常延遲測試案例\n\n## 場景背景\n\n此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。\n\nAPC 控制器每 100 ms 接收一次感測器資料，並依照 PID 控制邏輯更新閥門開度。\n\n當資料採集服務延遲時，APC 控制器會使用上一筆有效感測值維持閉迴路控制。\n\n## 觀測指標\n\n- CPU 使用率高於 90% 持續 30 秒時，控制迴圈延遲會明顯增加。\n- 感測器資料延遲超過 250 ms 時，APC 控制器會標記資料品質為 stale。\n- 閥門開度變化率超過每秒 12% 時，系統會提高採樣頻率。\n- 控制迴圈延遲的正常範圍應低於 120 ms。\n\n## 異常條件\n\n- 當 CPU 使用率高於 90% 且資料佇列長度超過 500 筆時，APC 控制器可能無法即時處理新資料。\n- 當感測器資料連續三次逾時時，APC 控制器會進入降級模式。\n- 當網路封包遺失率高於 5% 時，資料採集服務會重送遺失封包。\n\n## 作用機制\n\n資料採集服務會先將感測器資料寫入佇列，再由控制器讀取最新資料進行控制計算。\n\n如果資料佇列累積過多，APC 控制器讀取到的感測值會落後於現場設備狀態。\n\nPID 控制邏輯會根據目標值與量測值的誤差計算閥門開度。\n\n降級模式會限制閥門開度變化率，避免延遲資料造成過度控制。\n\n## 影響結果\n\n- 控制迴圈延遲增加會造成閥門開度更新變慢。\n- 閥門開度更新變慢會導致壓力調節時間拉長。\n- 壓力調節時間拉長可能造成產線流量波動。\n- 資料品質為 stale 時，監控畫面應顯示黃色警示。\n\n## 處置方式\n\n- 當控制迴圈延遲超過 120 ms 時，系統應記錄 performance warning。\n- 當降級模式啟動時，操作員應檢查 CPU 使用率、資料佇列長度與封包遺失率。\n- 若資料佇列長度持續超過 500 筆，應重新啟動資料採集服務。\n- 若 CPU 使用率持續高於 90%，應降低非關鍵診斷任務的執行頻率。\n\n## 定義\n\nstale 資料是指感測器資料的時間戳落後目前控制週期超過允許門檻。\n\n控制迴圈延遲是指感測器資料進入控制器到閥門命令輸出之間的時間差。\n\n降級模式是 APC 控制器在資料品質不足或處理延遲過高時採用的保護狀態。\n\n## 多句段落測試\n\nAPC 控制器延遲升高時，監控系統會記錄異常事件。CPU 使用率持續偏高時，資料採集服務的處理延遲可能增加。操作員確認降級模式啟動後，應檢查資料佇列長度。\n\n## 測試表格\n\n| 測試項目 | 觸發條件 | 預期結果 |\n| --- | --- | --- |\n| 高 CPU 負載 | CPU 使用率高於 90% 持續 30 秒 | 控制迴圈延遲增加並記錄 performance warning |\n| 資料逾時 | 感測器資料延遲超過 250 ms | 資料品質標記為 stale |\n| 佇列壅塞 | 資料佇列長度超過 500 筆 | APC 控制器可能讀取到過期感測值 |\n",
+  "replacements": [
+    {
+      "original_text": "控制器",
+      "replacement_text": "APC 控制器",
+      "source_range": {
+        "start": 122,
+        "end": 125
+      },
+      "evidence_text": "此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。",
+      "evidence_range": {
+        "start": 28,
+        "end": 62
+      },
+      "reference_type": "elliptical_name",
+      "reason": "承接場景中明載的 APC 控制器，描述其在資料採集服務延遲時的行為。",
+      "processed_range": {
+        "start": 122,
+        "end": 129
+      }
+    },
+    {
+      "original_text": "控制器",
+      "replacement_text": "APC 控制器",
+      "source_range": {
+        "start": 214,
+        "end": 217
+      },
+      "evidence_text": "此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。",
+      "evidence_range": {
+        "start": 28,
+        "end": 62
+      },
+      "reference_type": "elliptical_name",
+      "reason": "此觀測條件描述場景中 APC 控制器標記資料品質的具體行為。",
+      "processed_range": {
+        "start": 218,
+        "end": 225
+      }
+    },
+    {
+      "original_text": "控制器",
+      "replacement_text": "APC 控制器",
+      "source_range": {
+        "start": 334,
+        "end": 337
+      },
+      "evidence_text": "此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。",
+      "evidence_range": {
+        "start": 28,
+        "end": 62
+      },
+      "reference_type": "elliptical_name",
+      "reason": "此異常條件承接場景中唯一明載的 APC 控制器，描述其處理新資料的能力。",
+      "processed_range": {
+        "start": 342,
+        "end": 349
+      }
+    },
+    {
+      "original_text": "控制器",
+      "replacement_text": "APC 控制器",
+      "source_range": {
+        "start": 475,
+        "end": 478
+      },
+      "evidence_text": "此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。",
+      "evidence_range": {
+        "start": 28,
+        "end": 62
+      },
+      "reference_type": "elliptical_name",
+      "reason": "承接前段的佇列讀取機制，指向同一案例中的 APC 控制器。",
+      "processed_range": {
+        "start": 487,
+        "end": 494
+      }
+    },
+    {
+      "original_text": "控制器",
+      "replacement_text": "APC 控制器",
+      "source_range": {
+        "start": 1231,
+        "end": 1234
+      },
+      "evidence_text": "此測試文件描述一個 APC 控制器在高負載狀態下產生控制延遲的案例。",
+      "evidence_range": {
+        "start": 28,
+        "end": 62
+      },
+      "reference_type": "elliptical_name",
+      "reason": "表格的佇列壅塞測試對應本文案例中的控制器讀取資料行為，指向 APC 控制器。",
+      "processed_range": {
+        "start": 1247,
+        "end": 1254
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "original_text": "系統",
+      "source_range": {
+        "start": 253,
+        "end": 255
+      },
+      "reported_text": "系統",
+      "reported_range": {
+        "start": 253,
+        "end": 255
+      },
+      "proposed_replacement": null,
+      "reason_code": "ambiguous_reference",
+      "reason": "未明確界定提高採樣頻率的系統；可能指整體控制系統或控制器，無法唯一辨識，且「系統」並非「APC 控制器」內的省略名稱。",
+      "origin": "llm",
+      "candidate_index": null
+    },
+    {
+      "original_text": "系統",
+      "source_range": {
+        "start": 695,
+        "end": 697
+      },
+      "reported_text": "系統",
+      "reported_range": {
+        "start": 695,
+        "end": 697
+      },
+      "proposed_replacement": null,
+      "reason_code": "ambiguous_reference",
+      "reason": "未明確指出記錄 performance warning 的系統是監控系統、整體控制系統或其他元件，無法唯一辨識。",
+      "origin": "llm",
+      "candidate_index": null
+    },
+    {
+      "original_text": "控制器",
+      "source_range": {
+        "start": 446,
+        "end": 449
+      },
+      "reported_text": "控制器",
+      "reported_range": {
+        "start": 446,
+        "end": 449
+      },
+      "proposed_replacement": "APC 控制器",
+      "reason_code": "unsafe_boundary",
+      "reason": "替換會產生未確認的中英文邊界或黏合英文識別字；不自行加空格。",
+      "origin": "python_validation",
+      "candidate_index": 3
+    }
+  ],
+  "warnings": [
+    {
+      "code": "unsafe_boundary",
+      "message": "替換會產生未確認的中英文邊界或黏合英文識別字；不自行加空格。",
+      "source_range": {
+        "start": 446,
+        "end": 449
+      },
+      "candidate_index": 3
+    }
+  ],
+  "status": {
+    "execution_state": "completed_with_warnings",
+    "prompt_id": "prompts/step0.md",
+    "prompt_sha256": "516eac94863197fa76ec2ba80f6ab298b37447bc26a9511b77844595acb927ea",
+    "llm_call_count": 1,
+    "llm_retry_count": 0,
+    "candidate_count": 6,
+    "applied_count": 5,
+    "rejected_count": 1,
+    "unresolved_count": 3,
+    "warning_count": 1,
+    "llm_error_kind": null
+  }
+}
